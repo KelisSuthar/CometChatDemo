@@ -1,0 +1,23 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "https://dl.cloudsmith.io/public/cometchat/cometchat-pro-android/maven/"
+
+        }
+        maven { url "https://jitpack.io" }
+
+    }
+}
+rootProject.name = "CometChatDemo"
+include ':app'
