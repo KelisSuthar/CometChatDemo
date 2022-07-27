@@ -22,30 +22,7 @@ class MainActivity : AppCompatActivity() {
         create = findViewById(R.id.btnCreate)
         SharedPreferenceManager.init(applicationContext)
         initCometChat()
-        if (SharedPreferenceManager.getBoolean(AppConstants.IS_LOGIN, false)) {
-            startActivity(
-                Intent(
-                    this@MainActivity,
-                    MessageListActivity::class.java
-                )
-            )
-        }
-        login!!.setOnClickListener {
-            startActivity(
-                Intent(
-                    this@MainActivity,
-                    LoginActivity::class.java
-                )
-            )
-        }
-        create!!.setOnClickListener {
-            startActivity(
-                Intent(
-                    this@MainActivity,
-                    CreateUserActivity::class.java
-                )
-            )
-        }
+
     }
 
     private fun initCometChat() {
@@ -63,6 +40,30 @@ class MainActivity : AppCompatActivity() {
             object : CometChat.CallbackListener<String?>() {
                 override fun onSuccess(successMessage: String?) {
                     Log.i("INIT", "Initialization completed successfully")
+                    if (SharedPreferenceManager.getBoolean(AppConstants.IS_LOGIN, false)) {
+                        startActivity(
+                            Intent(
+                                this@MainActivity,
+                                FriendsListActivity::class.java
+                            )
+                        )
+                    }
+                    login!!.setOnClickListener {
+                        startActivity(
+                            Intent(
+                                this@MainActivity,
+                                LoginActivity::class.java
+                            )
+                        )
+                    }
+                    create!!.setOnClickListener {
+                        startActivity(
+                            Intent(
+                                this@MainActivity,
+                                CreateUserActivity::class.java
+                            )
+                        )
+                    }
                 }
 
                 override fun onError(e: CometChatException) {

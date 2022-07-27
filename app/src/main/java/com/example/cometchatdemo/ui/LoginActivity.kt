@@ -61,9 +61,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             object : CometChat.CallbackListener<User>() {
                 override fun onSuccess(p0: User?) {
                     Log.d("LOGIN", "Login Successful : " + p0?.toString())
-                    SharedPreferenceManager.putBoolean(AppConstants.IS_LOGIN,true)
+                    SharedPreferenceManager.putBoolean(AppConstants.IS_LOGIN, true)
                     SharedPreferenceManager.putString(AppConstants.UID, p0!!.uid)
-                    startActivity(Intent(this@LoginActivity, MessageListActivity::class.java))
+//                    startActivity(Intent(this@LoginActivity, MessageListActivity::class.java))
+                    startActivity(Intent(this@LoginActivity, FriendsListActivity::class.java))
                 }
 
                 override fun onError(p0: CometChatException?) {

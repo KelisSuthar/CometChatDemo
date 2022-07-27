@@ -8,8 +8,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.cometchatdemo.R
+import com.example.cometchatdemo.constants.AppConstants
+import com.example.pubnubchatdemo.dataclass.ChatMessages
 
-class chatAdapter(var array: ArrayList<String>) :
+class chatAdapter(var array: ArrayList<ChatMessages>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var MSG = 0
     var IMG = 1
@@ -56,16 +58,16 @@ class chatAdapter(var array: ArrayList<String>) :
         var txtRecieveMsg: TextView = itemView.findViewById(R.id.txtRecieveMsg)
 
 
-        fun bind(data: String, position: Int) {
-//            txtSendMsg.text = data.msg
-//            txtRecieveMsg.text = data.msg
-//            if (array[position].sender == Appconstants.UUID) {
-//                txtSendMsg.visibility = View.VISIBLE
-//                txtRecieveMsg.visibility = View.GONE
-//            } else {
-//                txtRecieveMsg.visibility = View.VISIBLE
-//                txtSendMsg.visibility = View.GONE
-//            }
+        fun bind(data: ChatMessages, position: Int) {
+            txtSendMsg.text = data.msg
+            txtRecieveMsg.text = data.msg
+            if (array[position].sender == AppConstants.MY_UID) {
+                txtSendMsg.visibility = View.VISIBLE
+                txtRecieveMsg.visibility = View.GONE
+            } else {
+                txtRecieveMsg.visibility = View.VISIBLE
+                txtSendMsg.visibility = View.GONE
+            }
 
         }
 
@@ -75,35 +77,35 @@ class chatAdapter(var array: ArrayList<String>) :
         var imgLeft: ImageView = itemView.findViewById(R.id.imgLeft)
         var imgRight: ImageView = itemView.findViewById(R.id.imgRight)
 
-        fun bind(data: String, position: Int) {
-//            imgLeft.LoadImg(data.msg.toString())
-//            imgRight.LoadImg(data.msg.toString())
-//            if (array[position].sender == Appconstants.UUID) {
-//                imgRight.visibility = View.VISIBLE
-//                imgLeft.visibility = View.GONE
-//            } else {
-//                imgRight.visibility = View.GONE
-//                imgLeft.visibility = View.VISIBLE
-//            }
+        fun bind(data: ChatMessages, position: Int) {
+            imgLeft.LoadImg(data.url.toString())
+            imgRight.LoadImg(data.url.toString())
+            if (array[position].sender == AppConstants.MY_UID) {
+                imgRight.visibility = View.VISIBLE
+                imgLeft.visibility = View.GONE
+            } else {
+                imgRight.visibility = View.GONE
+                imgLeft.visibility = View.VISIBLE
+            }
 
         }
 
     }
 
-//    override fun getItemViewType(position: Int): Int {
-//        val type: Int = if (array[position].is_image == true) {
-//            IMG
-//        } else {
-//            MSG
-//        }
-//        return type
-//    }
+    override fun getItemViewType(position: Int): Int {
+        val type: Int = if (array[position].is_image == true) {
+            IMG
+        } else {
+            MSG
+        }
+        return type
+    }
 }
 
 fun ImageView.LoadImg(url: String) {
     Glide.with(this.context)
         .load(url)
-        .placeholder(R.mipmap.ic_launcher)
+        .placeholder(R.drawable.ic_img_placeholder)
         .into(this)
 
 }
