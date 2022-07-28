@@ -6,6 +6,7 @@ import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.cometchat.pro.constants.CometChatConstants
 import com.cometchat.pro.core.Call
+import com.cometchat.pro.core.CallManager
 import com.cometchat.pro.core.CallSettings
 import com.cometchat.pro.core.CallSettings.CallSettingsBuilder
 import com.cometchat.pro.core.CometChat
@@ -23,12 +24,12 @@ class VIdeoCallActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_call)
         rlVideoCall = findViewById(R.id.rlVideoCall)
+        if (intent.extras!!.getBoolean(AppConstants.IS_JOIN_CALL, false)) {
+            videoCall(intent.extras!!.get(AppConstants.SESSION_ID).toString())
+        } else {
+            initiatCall()
+        }
 
-    }
-
-    override fun onResume() {
-        super.onResume()
-        initiatCall()
 
     }
 
@@ -42,21 +43,21 @@ class VIdeoCallActivity : AppCompatActivity() {
         CometChat.initiateCall(call, object : CometChat.CallbackListener<Call>() {
             override fun onSuccess(p0: Call?) {
                 Log.d("INITIATE_CALL", "Call initiated successfully: " + p0?.toString())
-                videoCall()
+                videoCall(p0!!.sessionId)
             }
 
             override fun onError(p0: CometChatException?) {
                 Log.d("INITIATE_CALL", "Call initialization failed with exception: " + p0?.message)
             }
-
         })
     }
 
-    private fun videoCall() {
-
+    private fun videoCall(session_id: String) {
         val callSettings: CallSettings = CallSettingsBuilder(this@VIdeoCallActivity, rlVideoCall)
-            .setSessionId(System.currentTimeMillis().toString())
-            .setAudioOnlyCall(false)
+            .setSessionId(session_id)
+            .startWithAudioMuted(true)
+            .startWithVideoMuted(true)
+            .showCallRecordButton(true)
             .build()
 
         CometChat.startCall(callSettings, object : OngoingCallListener {
@@ -74,6 +75,7 @@ class VIdeoCallActivity : AppCompatActivity() {
 
             override fun onCallEnded(call: Call) {
                 Log.d("VIDEOCALL", "onCallEnded: $call")
+                finish()
             }
 
             override fun onUserListUpdated(list: List<User>) {
@@ -86,10 +88,12 @@ class VIdeoCallActivity : AppCompatActivity() {
 
             override fun onRecordingStarted(p0: User?) {
                 Log.d("VIDEOCALL", "onRecordingStarted: $p0")
+                CallManager.getInstance().startRecording()
             }
 
             override fun onRecordingStopped(p0: User?) {
                 Log.d("VIDEOCALL", "onRecordingStopped: $p0")
+                CallManager.getInstance().stopRecording()
             }
 
             override fun onUserMuted(p0: User?, p1: User?) {

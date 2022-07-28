@@ -6,12 +6,38 @@
     android:layout_height="match_parent"
     tools:context=".ui.FriendsListActivity">
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabFriends"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Friends" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabGroups"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Groups" />
+
+    </com.google.android.material.tabs.TabLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvfriendsList"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tabLayout"
         tools:listitem="@layout/friends_row_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

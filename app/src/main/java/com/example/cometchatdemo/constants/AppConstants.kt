@@ -9,4 +9,6 @@ object AppConstants {
     const val MY_UID = "cometchatdemo_1658839302445"
     const val REC_UID = "ios_1"
     const val IS_LOGIN = "is_login"
+    const val IS_JOIN_CALL = "is_join_call"
+    const val SESSION_ID = "seddion_id"
 }

@@ -38,25 +38,22 @@ class FriendsListAdapterr(val context: Context, var array: ArrayList<Conversatio
         fun bind(data: Conversation, position: Int) {
 
             val user: User = data.conversationWith as User
-            val lasMsg: JSONObject
             if(data.lastMessage.rawMessage.get("type") == "image")
             {
                 txt_user_message.text = "Image"
-            }else   {
+            }else if(data.lastMessage.rawMessage.get("type") == "video") {
+
+                txt_user_message.text = "Video"
+            }else{
                 txt_user_message.text =
                     (data.lastMessage.rawMessage.get("data") as JSONObject).get("text").toString()
             }
-
-
             if (user.avatar.isNullOrEmpty()) {
                 img_profile.LoadImg("")
             } else {
                 img_profile.LoadImg(user.avatar)
             }
             txt_user_name.text = user.name
-
-
-
             if (data.unreadMessageCount == 0) {
                 totalMessage.visibility = View.GONE
             } else {
