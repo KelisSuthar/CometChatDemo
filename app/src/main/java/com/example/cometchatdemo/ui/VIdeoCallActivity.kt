@@ -88,12 +88,12 @@ class VIdeoCallActivity : AppCompatActivity() {
 
             override fun onRecordingStarted(p0: User?) {
                 Log.d("VIDEOCALL", "onRecordingStarted: $p0")
-                CallManager.getInstance().startRecording()
+
             }
 
             override fun onRecordingStopped(p0: User?) {
                 Log.d("VIDEOCALL", "onRecordingStopped: $p0")
-                CallManager.getInstance().stopRecording()
+
             }
 
             override fun onUserMuted(p0: User?, p1: User?) {

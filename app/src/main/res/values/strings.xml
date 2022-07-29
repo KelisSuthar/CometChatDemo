@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">CometChatDemo</string>
+    <array name="groupType">
+        <item>Public Group</item>
+        <item>Private Group</item>
+        <item>Password Protected Group</item>
+    </array>
 </resources>
