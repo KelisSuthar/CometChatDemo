@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 
 
 object SharedPreferenceManager {
-    val PREF_NAME ="_pref"
+    val PREF_NAME = "_pref"
     private var isInit = false
     private var prefs: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null

@@ -38,13 +38,12 @@ class FriendsListAdapterr(val context: Context, var array: ArrayList<Conversatio
         fun bind(data: Conversation, position: Int) {
 
             val user: User = data.conversationWith as User
-            if(data.lastMessage.rawMessage.get("type") == "image")
-            {
+            if (data.lastMessage.rawMessage.get("type") == "image") {
                 txt_user_message.text = "Image"
-            }else if(data.lastMessage.rawMessage.get("type") == "video") {
+            } else if (data.lastMessage.rawMessage.get("type") == "video") {
 
                 txt_user_message.text = "Video"
-            }else{
+            } else {
                 txt_user_message.text =
                     (data.lastMessage.rawMessage.get("data") as JSONObject).get("text").toString()
             }

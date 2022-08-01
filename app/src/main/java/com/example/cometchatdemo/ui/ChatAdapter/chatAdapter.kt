@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.cometchatdemo.R
 import com.example.cometchatdemo.constants.AppConstants
-import com.example.pubnubchatdemo.dataclass.ChatMessages
+import com.example.cometchatdemo.dataclass.ChatMessages
 
-class chatAdapter(var array: ArrayList<ChatMessages>) :
+class chatAdapter(var array: ArrayList<ChatMessages>, var b: Boolean) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var MSG = 0
     var IMG = 1
@@ -50,23 +50,37 @@ class chatAdapter(var array: ArrayList<ChatMessages>) :
     }
 
     override fun getItemCount(): Int {
+
         return array.size
     }
 
     inner class MessageViewHolder1(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var txtSendMsg: TextView = itemView.findViewById(R.id.txtSendMsg)
         var txtRecieveMsg: TextView = itemView.findViewById(R.id.txtRecieveMsg)
-
+        var txtRecieveMsgName: TextView = itemView.findViewById(R.id.txtRecieveMsgName)
+        var txtSendMsgName: TextView = itemView.findViewById(R.id.txtSendMsgName)
 
         fun bind(data: ChatMessages, position: Int) {
             txtSendMsg.text = data.msg
             txtRecieveMsg.text = data.msg
+            txtRecieveMsgName.text = data.sender_name
+            txtSendMsgName.text = data.sender_name
             if (array[position].sender == AppConstants.MY_UID) {
                 txtSendMsg.visibility = View.VISIBLE
                 txtRecieveMsg.visibility = View.GONE
+                if (b) {
+                    txtRecieveMsgName.visibility = View.GONE
+                    txtSendMsgName.visibility = View.VISIBLE
+                }
+
             } else {
                 txtRecieveMsg.visibility = View.VISIBLE
                 txtSendMsg.visibility = View.GONE
+                if (b) {
+                    txtSendMsgName.visibility = View.GONE
+                    txtRecieveMsgName.visibility = View.VISIBLE
+                }
+
             }
 
         }
@@ -76,14 +90,25 @@ class chatAdapter(var array: ArrayList<ChatMessages>) :
     inner class MessageViewHolder2(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var imgLeft: ImageView = itemView.findViewById(R.id.imgLeft)
         var imgRight: ImageView = itemView.findViewById(R.id.imgRight)
-
+        var txtRecieveMsgName: TextView = itemView.findViewById(R.id.txtRecieveMsgName)
+        var txtSendMsgName: TextView = itemView.findViewById(R.id.txtSendMsgName)
         fun bind(data: ChatMessages, position: Int) {
             imgLeft.LoadImg(data.url.toString())
             imgRight.LoadImg(data.url.toString())
+            txtRecieveMsgName.text = data.sender_name
+            txtSendMsgName.text = data.sender_name
             if (array[position].sender == AppConstants.MY_UID) {
                 imgRight.visibility = View.VISIBLE
                 imgLeft.visibility = View.GONE
+                if (b) {
+                    txtRecieveMsgName.visibility = View.GONE
+                    txtSendMsgName.visibility = View.VISIBLE
+                }
             } else {
+                if (b) {
+                    txtSendMsgName.visibility = View.GONE
+                    txtRecieveMsgName.visibility = View.VISIBLE
+                }
                 imgRight.visibility = View.GONE
                 imgLeft.visibility = View.VISIBLE
             }

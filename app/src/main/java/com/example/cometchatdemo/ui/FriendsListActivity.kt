@@ -16,6 +16,7 @@ import com.cometchat.pro.constants.CometChatConstants
 import com.cometchat.pro.core.CometChat
 import com.cometchat.pro.core.CometChat.CallbackListener
 import com.cometchat.pro.core.CometChat.CreateGroupWithMembersListener
+import com.cometchat.pro.core.ConversationsRequest
 import com.cometchat.pro.core.ConversationsRequest.ConversationsRequestBuilder
 import com.cometchat.pro.core.GroupsRequest
 import com.cometchat.pro.core.GroupsRequest.GroupsRequestBuilder
@@ -88,8 +89,9 @@ class FriendsListActivity : AppCompatActivity() {
         val group_name = dialog.findViewById<TextInputEditText>(R.id.group_name)
         val group_desc = dialog.findViewById<TextInputEditText>(R.id.group_desc)
         val group_pwd = dialog.findViewById<TextInputEditText>(R.id.group_pwd)
-//        val group_cnf_pwd = dialog.findViewById<TextInputEditText>(R.id.group_cnf_pwd)
-//        val group_cnf_pwd = dialog.findViewById<TextInputLayout>(R.id.input_group_cnf_pwd)
+        val group_cnf_pwd = dialog.findViewById<TextInputEditText>(R.id.group_cnf_pwd)
+        val input_group_cnf_pwd = dialog.findViewById<TextInputLayout>(R.id.input_group_cnf_pwd)
+        val input_group_pwd = dialog.findViewById<TextInputLayout>(R.id.input_group_pwd)
 
 
         if (grouptype_spinner != null) {
@@ -106,20 +108,25 @@ class FriendsListActivity : AppCompatActivity() {
                     view: View, position: Int, id: Long
                 ) {
                     if (position == 2) {
-                        group_pwd.visibility = View.VISIBLE
-//                        group_cnf_pwd.visibility = View.VISIBLE
+                        input_group_pwd.visibility = View.VISIBLE
+                        input_group_cnf_pwd.visibility = View.VISIBLE
                     } else {
-                        group_pwd.visibility = View.GONE
-//                        group_cnf_pwd.visibility = View.GONE
+                        input_group_pwd.visibility = View.GONE
+                        input_group_cnf_pwd.visibility = View.GONE
                     }
 
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
-                    // write code to perform some action
+
                 }
             }
             SUB.setOnClickListener {
+                createGroup(
+                    group_name.text?.trim().toString(),
+                    group_desc.text?.trim().toString(),
+                    grouptype_spinner.selectedItemPosition
+                )
                 dialog.dismiss()
             }
 
@@ -157,17 +164,29 @@ class FriendsListActivity : AppCompatActivity() {
 
     }
 
-    private fun createGroup() {
-        val GUID = "GUID"
-        val groupName = "Hello Group!"
-        val groupType = CometChatConstants.GROUP_TYPE_PUBLIC
-        val password = ""
+    private fun createGroup(name: String, group_desc: String, pos: Int) {
+        val GUID = System.currentTimeMillis()
+        var groupType: String = CometChatConstants.GROUP_TYPE_PUBLIC
+        when (pos) {
+            0 -> {
+                groupType = CometChatConstants.GROUP_TYPE_PUBLIC
+            }
+            1 -> {
+                groupType = CometChatConstants.GROUP_TYPE_PRIVATE
+            }
+            2 -> {
+                groupType = CometChatConstants.GROUP_TYPE_PASSWORD
+            }
+        }
 
-        val group = Group(GUID, groupName, groupType, password)
+
+        val group = Group(GUID.toString(), name, groupType, "")
 
         CometChat.createGroup(group, object : CallbackListener<Group>() {
             override fun onSuccess(group: Group) {
                 Log.d("CREATE_GROUP", "Group created successfully: $group")
+                tabGroups!!.isSelected = true
+
             }
 
             override fun onError(e: CometChatException) {
@@ -225,9 +244,7 @@ class FriendsListActivity : AppCompatActivity() {
                 Log.d("GROUPS_LIST", p0.toString())
                 p0!!.forEach {
                     Log.d("GROUPS_LIST", it.name)
-
                 }
-
             }
 
             override fun onError(p0: CometChatException?) {
@@ -240,7 +257,7 @@ class FriendsListActivity : AppCompatActivity() {
     }
 
     private fun getAllFriendsList(conversationType: String) {
-        val conversationsRequest = ConversationsRequestBuilder()
+        val conversationsRequest: ConversationsRequest? = ConversationsRequestBuilder()
             .setLimit(50)
             .setConversationType(conversationType)
             .build()
@@ -251,9 +268,10 @@ class FriendsListActivity : AppCompatActivity() {
             override fun onSuccess(p0: List<Conversation>?) {
                 Log.d("USER_LIST", "User list received: " + p0!!.size)
                 p0.forEach {
-                    Log.d("USER_LIST_STATUS", it.conversationId)
-                    Log.d("USER_LIST_STATUS", it.toString())
-                    Log.d("USER_LIST_STATUS", (it.lastMessage.rawMessage).toString())
+//                    Log.d("USER_LIST_STATUS", it.conversationId)
+//                    Log.d("USER_LIST_STATUS", it.toString())
+//                    Log.d("USER_LIST_STATUS", (it.lastMessage.rawMessage).toString())
+
 
                     if (conversationType == CometChatConstants.CONVERSATION_TYPE_USER) {
 

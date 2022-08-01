@@ -10,5 +10,6 @@ object AppConstants {
     const val REC_UID = "ios_1"
     const val IS_LOGIN = "is_login"
     const val IS_JOIN_CALL = "is_join_call"
+    const val IS_GROUP = "is_group"
     const val SESSION_ID = "seddion_id"
 }

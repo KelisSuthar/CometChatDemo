@@ -10,10 +10,9 @@
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!--    <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT" />-->
-    <!--    <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT" />-->
 
     <application
+        android:name=".AppClass"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -25,9 +24,13 @@
         android:theme="@style/Theme.CometChatDemo"
         tools:targetApi="31">
         <activity
+            android:name=".ui.GroupMessageListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.VIdeoCallActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.FriendsListActivity"
             android:exported="false"
@@ -51,6 +54,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.LoginActivity" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.video.record.fileprovider"

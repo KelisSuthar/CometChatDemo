@@ -1,6 +1,7 @@
 package com.example.cometchatdemo.ui.GroupListAdapter
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cometchat.pro.models.Conversation
 import com.cometchat.pro.models.Group
 import com.example.cometchatdemo.R
+import com.example.cometchatdemo.constants.AppConstants
 import com.example.cometchatdemo.ui.ChatAdapter.LoadImg
+import com.example.cometchatdemo.ui.GroupMessageListActivity
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -47,20 +50,22 @@ class GroupListAdapter(val context: Context, var array: ArrayList<Conversation>)
             val date = Date(data.updatedAt)
             val format = SimpleDateFormat("HH:mm a")
             tvTimeStamp.text = format.format(date)
-            if (data.lastMessage.rawMessage.get("type") == "image") {
-                txt_user_message.text = "Image"
-            } else if (data.lastMessage.rawMessage.get("type") == "video") {
+            if (data.lastMessage != null) {
+                if (data.lastMessage.rawMessage.get("type") == "image") {
+                    txt_user_message.text = "Members: " + group.membersCount + "\nImage"
+                } else if (data.lastMessage.rawMessage.get("type") == "video") {
 
-                txt_user_message.text = "Video"
-            } else {
-                val parent: JSONObject = (data.lastMessage.rawMessage.get("data") as JSONObject)
-                val entities: JSONObject =
-                    (parent.get("entities") as JSONObject).get("sender") as JSONObject
-                val sender: String =
-                    (entities.get("entity") as JSONObject).get("name").toString()
-                txt_user_message.text = "$sender: " +
-                        parent.get("text")
-                            .toString()
+                    txt_user_message.text = "Members: " + group.membersCount + "\nVideo"
+                } else {
+                    val parent: JSONObject = (data.lastMessage.rawMessage.get("data") as JSONObject)
+                    val entities: JSONObject =
+                        (parent.get("entities") as JSONObject).get("sender") as JSONObject
+                    val sender: String =
+                        (entities.get("entity") as JSONObject).get("name").toString()
+                    txt_user_message.text = "Members: " + group.membersCount + "\n" + "$sender: " +
+                            parent.get("text")
+                                .toString()
+                }
             }
             if (group.icon.isNullOrEmpty()) {
                 img_profile.LoadImg("")
@@ -78,14 +83,14 @@ class GroupListAdapter(val context: Context, var array: ArrayList<Conversation>)
             imgStatus.visibility = View.GONE
 
 
-//            itemView.setOnClickListener {
-//                context.startActivity(
-//                    Intent(
-//                        context,
-//                        MessageListActivity::class.java
-//                    ).putExtra(AppConstants.UID, group.guid.toString())
-//                )
-//            }
+            itemView.setOnClickListener {
+                context.startActivity(
+                    Intent(
+                        context,
+                        GroupMessageListActivity::class.java
+                    ).putExtra(AppConstants.UID, group.guid.toString())
+                )
+            }
         }
     }
 }
