@@ -124,12 +124,18 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
                 setMediaDialog()
             }
             R.id.imgVideoCall -> {
-          //      CometChat.removeCallListener(resources.getString(R.string.app_name))
+                //      CometChat.removeCallListener(resources.getString(R.string.app_name))
                 startActivity(
                     Intent(
                         this@MessageListActivity,
                         VIdeoCallActivity::class.java
-                    ).putExtra(AppConstants.UID, intent.extras!!.get(AppConstants.UID).toString())
+                    ).putExtra(AppConstants.CALL_TYPE, AppConstants.CREATE_CALL).putExtra(
+                        AppConstants.UID,
+                        intent.extras!!.get(AppConstants.UID).toString()
+                    ).putExtra(
+                        AppConstants.IS_GROUP,
+                        false
+                    )
                 )
                 finish()
             }
@@ -153,7 +159,8 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
                             "",
                             textMessage.sender.uid,
                             "",
-                            false
+                            false,
+                            textMessage.sentAt.toString()
                         )
                     )
                     adapter!!.notifyDataSetChanged()
@@ -168,7 +175,8 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
                             mediaMessage.attachment.fileUrl,
                             mediaMessage.sender.uid,
                             "",
-                            true
+                            true,
+                            mediaMessage.sentAt.toString()
                         )
                     )
                     adapter!!.notifyDataSetChanged()
@@ -362,7 +370,7 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
     override fun onDestroy() {
         super.onDestroy()
         CometChat.removeMessageListener(resources.getString(R.string.app_name))
-      //  CometChat.removeCallListener(resources.getString(R.string.app_name))
+        //  CometChat.removeCallListener(resources.getString(R.string.app_name))
     }
 
     private fun callHistory() {
@@ -374,30 +382,37 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
         messagesRequest?.fetchPrevious(object : CometChat.CallbackListener<List<BaseMessage>>() {
             override fun onSuccess(p0: List<BaseMessage>?) {
                 if (!p0.isNullOrEmpty()) {
+                    p0.forEach { Log.d("HISTORY", it.toString()) }
                     for (baseMessage in p0) {
-//                        Log.d("HISTORY", "TextMessage: ${baseMessage}")
+
                         if (baseMessage is TextMessage) {
-                            Log.d("HISTORY", "TextMessage: ${baseMessage.text}")
+//                            Log.d("HISTORY", "TextMessage: ${baseMessage.text}")
                             mMessages.add(
                                 ChatMessages(
                                     baseMessage.text,
                                     "",
                                     baseMessage.sender.uid,
                                     "",
-                                    false
+                                    false,
+                                    baseMessage.sentAt.toString()
                                 )
                             )
                         } else if (baseMessage is MediaMessage) {
-                            Log.d("HISTORY", "MediaMessage: ${baseMessage.attachment.fileUrl}")
+//                            Log.d("HISTORY", "MediaMessage: ${baseMessage.attachment.fileUrl}")
                             mMessages.add(
                                 ChatMessages(
                                     "",
                                     baseMessage.attachment.fileUrl,
                                     baseMessage.sender.uid,
                                     "",
-                                    true
+                                    true,
+                                    baseMessage.sentAt.toString()
                                 )
                             )
+                        }else if(baseMessage is Call){
+                        }else if(baseMessage is Action)
+                        {
+
                         }
                         CometChat.markAsRead(
                             baseMessage.id,
@@ -436,7 +451,7 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
             override fun onSuccess(p0: TextMessage?) {
                 Log.d("SEND_NORMAL_MESSAGE", "Message sent successfully: " + p0?.toString())
 
-                mMessages.add(ChatMessages(p0?.text, "", p0?.sender?.uid, "", false))
+                mMessages.add(ChatMessages(p0?.text, "", p0?.sender?.uid, "", false, p0?.sentAt.toString()))
                 editText!!.setText("")
                 adapter!!.notifyDataSetChanged()
                 recyclerView!!.scrollToPosition(recyclerView!!.adapter!!.itemCount - 1)
@@ -485,7 +500,8 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
                             p0?.attachment?.fileUrl,
                             p0?.sender?.uid,
                             "",
-                            true
+                            true,
+                            p0?.sentAt.toString()
                         )
                     )
                     adapter!!.notifyDataSetChanged()

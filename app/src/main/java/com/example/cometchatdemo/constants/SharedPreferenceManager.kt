@@ -2,6 +2,7 @@ package com.example.cometchatdemo.constants
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.cometchat.pro.models.User
 
 
 object SharedPreferenceManager {
@@ -17,6 +18,7 @@ object SharedPreferenceManager {
         editor = prefs!!.edit()
         isInit = true
     }
+
 
     fun putBoolean(key: String, value: Boolean) {
         editor!!.putBoolean(key, value)

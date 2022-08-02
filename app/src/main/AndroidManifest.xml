@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".AppClass"
@@ -23,6 +24,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CometChatDemo"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.CallsUiManager"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.GroupMessageListActivity"
             android:exported="false"

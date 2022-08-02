@@ -63,7 +63,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                     Log.d("LOGIN", "Login Successful : " + p0?.toString())
                     SharedPreferenceManager.putBoolean(AppConstants.IS_LOGIN, true)
                     SharedPreferenceManager.putString(AppConstants.UID, p0!!.uid)
-//                    startActivity(Intent(this@LoginActivity, MessageListActivity::class.java))
+                    SharedPreferenceManager.putString(AppConstants.NAME, p0!!.name)
+                    SharedPreferenceManager.putString(AppConstants.AVATAR, p0!!.avatar)
                     startActivity(Intent(this@LoginActivity, FriendsListActivity::class.java))
                 }
 

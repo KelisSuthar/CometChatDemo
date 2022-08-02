@@ -63,15 +63,12 @@ class FriendsListActivity : AppCompatActivity() {
                     getAllFriendsList(CometChatConstants.CONVERSATION_TYPE_GROUP)
                 }
             }
-
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
-
         addGroup!!.setOnClickListener {
             dialogCreateGroup()
         }
-
     }
 
     private fun dialogCreateGroup() {
@@ -269,8 +266,11 @@ class FriendsListActivity : AppCompatActivity() {
                 Log.d("USER_LIST", "User list received: " + p0!!.size)
                 p0.forEach {
 //                    Log.d("USER_LIST_STATUS", it.conversationId)
-//                    Log.d("USER_LIST_STATUS", it.toString())
-//                    Log.d("USER_LIST_STATUS", (it.lastMessage.rawMessage).toString())
+                    Log.d("USER_LIST_STATUS", it.toString())
+                    if (it.lastMessage != null) {
+                        Log.d("USER_LIST_STATUS", (it.lastMessage.rawMessage).toString())
+                    }
+
 
 
                     if (conversationType == CometChatConstants.CONVERSATION_TYPE_USER) {

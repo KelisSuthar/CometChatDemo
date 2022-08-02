@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.example.cometchatdemo.R
 import com.example.cometchatdemo.constants.AppConstants
 import com.example.cometchatdemo.dataclass.ChatMessages
+import java.text.SimpleDateFormat
 
 class chatAdapter(var array: ArrayList<ChatMessages>, var b: Boolean) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -63,23 +64,29 @@ class chatAdapter(var array: ArrayList<ChatMessages>, var b: Boolean) :
         fun bind(data: ChatMessages, position: Int) {
             txtSendMsg.text = data.msg
             txtRecieveMsg.text = data.msg
-            txtRecieveMsgName.text = data.sender_name
-            txtSendMsgName.text = data.sender_name
+
+            val format = SimpleDateFormat("HH:mm a")
+            if (b) {
+                txtRecieveMsgName.text =
+                    data.sender_name + "\n" + format.format(data.message_time!!.toLong())
+                txtSendMsgName.text =
+                    data.sender_name + "\n" + format.format(data.message_time!!.toLong())
+            } else {
+                txtRecieveMsgName.text = format.format(data.message_time!!.toLong())
+                txtSendMsgName.text = format.format(data.message_time.toLong())
+            }
             if (array[position].sender == AppConstants.MY_UID) {
                 txtSendMsg.visibility = View.VISIBLE
                 txtRecieveMsg.visibility = View.GONE
-                if (b) {
-                    txtRecieveMsgName.visibility = View.GONE
-                    txtSendMsgName.visibility = View.VISIBLE
-                }
+                txtRecieveMsgName.visibility = View.GONE
+                txtSendMsgName.visibility = View.VISIBLE
+
 
             } else {
                 txtRecieveMsg.visibility = View.VISIBLE
                 txtSendMsg.visibility = View.GONE
-                if (b) {
-                    txtSendMsgName.visibility = View.GONE
-                    txtRecieveMsgName.visibility = View.VISIBLE
-                }
+                txtSendMsgName.visibility = View.GONE
+                txtRecieveMsgName.visibility = View.VISIBLE
 
             }
 
@@ -95,20 +102,24 @@ class chatAdapter(var array: ArrayList<ChatMessages>, var b: Boolean) :
         fun bind(data: ChatMessages, position: Int) {
             imgLeft.LoadImg(data.url.toString())
             imgRight.LoadImg(data.url.toString())
-            txtRecieveMsgName.text = data.sender_name
-            txtSendMsgName.text = data.sender_name
+            val format = SimpleDateFormat("HH:mm a")
+            if (b) {
+                txtRecieveMsgName.text =
+                    data.sender_name + "\n" + format.format(data.message_time!!.toLong())
+                txtSendMsgName.text =
+                    data.sender_name + "\n" + format.format(data.message_time.toLong())
+            } else {
+                txtRecieveMsgName.text = format.format(data.message_time!!.toLong())
+                txtSendMsgName.text = format.format(data.message_time.toLong())
+            }
             if (array[position].sender == AppConstants.MY_UID) {
                 imgRight.visibility = View.VISIBLE
                 imgLeft.visibility = View.GONE
-                if (b) {
-                    txtRecieveMsgName.visibility = View.GONE
-                    txtSendMsgName.visibility = View.VISIBLE
-                }
+                txtRecieveMsgName.visibility = View.GONE
+                txtSendMsgName.visibility = View.VISIBLE
             } else {
-                if (b) {
-                    txtSendMsgName.visibility = View.GONE
-                    txtRecieveMsgName.visibility = View.VISIBLE
-                }
+                txtSendMsgName.visibility = View.GONE
+                txtRecieveMsgName.visibility = View.VISIBLE
                 imgRight.visibility = View.GONE
                 imgLeft.visibility = View.VISIBLE
             }

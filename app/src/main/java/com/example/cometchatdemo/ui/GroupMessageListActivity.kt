@@ -115,29 +115,30 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
         messagesRequest?.fetchPrevious(object : CometChat.CallbackListener<List<BaseMessage>>() {
             override fun onSuccess(p0: List<BaseMessage>?) {
                 if (!p0.isNullOrEmpty()) {
+                    p0.forEach { Log.d("HISTORY", it.toString()) }
                     for (baseMessage in p0) {
                         if (baseMessage is TextMessage) {
-                            Log.d("HISTORY", "TextMessage: ${baseMessage.text}")
-                            Log.d("HISTORY", "TextMessage: ${baseMessage.sender.name}")
+//                            Log.d("HISTORY", "TextMessage: ${baseMessage.text}")
                             mMessages.add(
                                 ChatMessages(
                                     baseMessage.text,
                                     "",
                                     baseMessage.sender.uid,
                                     baseMessage.sender.name,
-                                    false
+                                    false,
+                                    baseMessage.sentAt.toString()
                                 )
                             )
                         } else if (baseMessage is MediaMessage) {
-                            Log.d("HISTORY", "MediaMessage: ${baseMessage.attachment.fileUrl}")
-                            Log.d("HISTORY", "TextMessage: ${baseMessage.sender.name}")
+//                            Log.d("HISTORY", "MediaMessage: ${baseMessage.attachment.fileUrl}")
                             mMessages.add(
                                 ChatMessages(
                                     "",
                                     baseMessage.attachment.fileUrl,
                                     baseMessage.sender.uid,
                                     baseMessage.sender.name,
-                                    true
+                                    true,
+                                    baseMessage.sentAt.toString()
                                 )
                             )
 
@@ -182,13 +183,18 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
                 setMediaDialog()
             }
             R.id.imgVideoCall -> {
-                startActivity(
-                    Intent(
-                        this@GroupMessageListActivity,
-                        VIdeoCallActivity::class.java
-                    ).putExtra(AppConstants.UID, intent.extras!!.get(AppConstants.UID).toString())
-                        .putExtra(AppConstants.IS_GROUP, true)
-                )
+                 startActivity (
+                        Intent(
+                            this@GroupMessageListActivity,
+                            VIdeoCallActivity::class.java
+                        ).putExtra(AppConstants.CALL_TYPE, AppConstants.CREATE_CALL).putExtra(
+                            AppConstants.UID,
+                            intent.extras!!.get(AppConstants.UID).toString()
+                        ).putExtra(
+                            AppConstants.IS_GROUP,
+                            true
+                        )
+                        )
                 finish()
             }
             R.id.imgGroupInfo -> {
@@ -240,7 +246,7 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
             override fun onSuccess(p0: TextMessage?) {
                 Log.d("SEND_NORMAL_MESSAGE", "Message sent successfully: " + p0?.toString())
 
-                mMessages.add(ChatMessages(p0?.text, "", p0?.sender?.uid, p0!!.sender.name, false))
+                mMessages.add(ChatMessages(p0?.text, "", p0?.sender?.uid, p0!!.sender.name, false,textMessage.sentAt.toString()))
                 editText!!.setText("")
                 adapter!!.notifyDataSetChanged()
                 recyclerView!!.scrollToPosition(recyclerView!!.adapter!!.itemCount - 1)
@@ -348,7 +354,8 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
                             p0?.attachment?.fileUrl,
                             p0?.sender?.uid,
                             p0!!.sender.name,
-                            true
+                            true,
+                            p0.sentAt.toString()
                         )
                     )
                     adapter!!.notifyDataSetChanged()
@@ -388,7 +395,7 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
         super.onResume()
 
         getGroupDetails()
-        //setIncommingCallListener()
+        // setIncommingCallListener()
 
         CometChat.addMessageListener(
             resources.getString(R.string.app_name),
@@ -401,7 +408,8 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
                             "",
                             textMessage.sender.uid,
                             textMessage.sender.name,
-                            false
+                            false,
+                            textMessage.sentAt.toString()
                         )
                     )
                     adapter!!.notifyDataSetChanged()
@@ -416,7 +424,8 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
                             mediaMessage.attachment.fileUrl,
                             mediaMessage.sender.uid,
                             mediaMessage.sender.name,
-                            true
+                            true,
+                            mediaMessage.sentAt.toString()
                         )
                     )
                     adapter!!.notifyDataSetChanged()

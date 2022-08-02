@@ -47,9 +47,9 @@ class GroupListAdapter(val context: Context, var array: ArrayList<Conversation>)
         val totalMessage: TextView = itemView!!.findViewById(R.id.totalMessage)
         fun bind(data: Conversation, position: Int) {
             val group: Group = data.conversationWith as Group
-            val date = Date(data.updatedAt)
+//
             val format = SimpleDateFormat("HH:mm a")
-            tvTimeStamp.text = format.format(date)
+            tvTimeStamp.text = format.format(data.updatedAt)
             if (data.lastMessage != null) {
                 if (data.lastMessage.rawMessage.get("type") == "image") {
                     txt_user_message.text = "Members: " + group.membersCount + "\nImage"
@@ -62,9 +62,13 @@ class GroupListAdapter(val context: Context, var array: ArrayList<Conversation>)
                         (parent.get("entities") as JSONObject).get("sender") as JSONObject
                     val sender: String =
                         (entities.get("entity") as JSONObject).get("name").toString()
-                    txt_user_message.text = "Members: " + group.membersCount + "\n" + "$sender: " +
-                            parent.get("text")
-                                .toString()
+                    if (parent.has("text")) {
+                        txt_user_message.text =
+                            "Members: " + group.membersCount + "\n" + "$sender: " +
+                                    parent.get("text")
+                                        .toString()
+                    }
+
                 }
             }
             if (group.icon.isNullOrEmpty()) {

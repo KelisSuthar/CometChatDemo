@@ -3,8 +3,12 @@ package com.example.cometchatdemo.ui
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.View
+import android.widget.ImageView
 import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.cometchat.pro.constants.CometChatConstants
 import com.cometchat.pro.core.Call
 import com.cometchat.pro.core.CallSettings
@@ -17,63 +21,86 @@ import com.cometchat.pro.models.AudioMode
 import com.cometchat.pro.models.User
 import com.example.cometchatdemo.R
 import com.example.cometchatdemo.constants.AppConstants
+import com.example.cometchatdemo.constants.SharedPreferenceManager
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
-class VIdeoCallActivity : AppCompatActivity() {
+class VIdeoCallActivity : AppCompatActivity(), View.OnClickListener {
     var rlVideoCall: RelativeLayout? = null
     var IS_GROUP = false
     var IS_AUTO_END = true
     var session_id: String = ""
+    var incoming_call_view: MaterialCardView? = null
+    var caller_name: TextView? = null
+    var call_type: TextView? = null
+    var caller_av: ImageView? = null
+    var decline_incoming: MaterialButton? = null
+    var accept_incoming: MaterialButton? = null
+    var outgoing_call_view: RelativeLayout? = null
+    var calling_tv: TextView? = null
+    var user_av: ImageView? = null
+    var user_tv: TextView? = null
+    var call_hang_btn: FloatingActionButton? = null
+    var is_group: Boolean = false
+    var reject_session_id: String = ""
+    var isCall_rejected: Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_call)
+
+        incoming_call_view = findViewById(R.id.incoming_call_view)
+        caller_name = findViewById(R.id.caller_name)
+        call_type = findViewById(R.id.call_type)
+        caller_av = findViewById(R.id.caller_av)
+        decline_incoming = findViewById(R.id.decline_incoming)
+        accept_incoming = findViewById(R.id.accept_incoming)
+        outgoing_call_view = findViewById(R.id.outgoing_call_view)
+        calling_tv = findViewById(R.id.calling_tv)
+        user_av = findViewById(R.id.user_av)
+        user_tv = findViewById(R.id.user_tv)
+        call_hang_btn = findViewById(R.id.call_hang_btn)
+
+        decline_incoming!!.setOnClickListener(this)
+        accept_incoming!!.setOnClickListener(this)
+        call_hang_btn!!.setOnClickListener(this)
+
+
+
         rlVideoCall = findViewById(R.id.rlVideoCall)
+        mainView = findViewById(R.id.rlVideoCall)
+        caller_name!!.text = intent.extras!!.get(AppConstants.NAME).toString()
+        call_type!!.text = "Video"
+        caller_av!!.LoadImg(intent.extras!!.get(AppConstants.AVATAR).toString())
+        user_av!!.LoadImg(SharedPreferenceManager.getString(AppConstants.AVATAR, "").toString())
+        user_tv!!.text = SharedPreferenceManager.getString(AppConstants.NAME, "Iron Man")
+
+        is_group = intent.extras!!.getBoolean(AppConstants.IS_GROUP)
         if (intent.extras!!.getBoolean(AppConstants.IS_GROUP)) {
             IS_GROUP = true
         }
-        if (intent.extras!!.getBoolean(AppConstants.IS_JOIN_CALL, false)) {
-            videoCall(intent.extras!!.get(AppConstants.SESSION_ID).toString())
-        } else {
-            initiatCall()
+        when (intent.extras!!.getString(AppConstants.CALL_TYPE)) {
+            AppConstants.INCOMMING_CALL -> {
+                outgoing_call_view!!.visibility = View.GONE
+            }
+            AppConstants.ACCEPT_CALL -> {
+                outgoing_call_view!!.visibility = View.GONE
+                incoming_call_view!!.visibility = View.GONE
+                rlVideoCall!!.visibility = View.VISIBLE
+                videoCall(intent.extras!!.get(AppConstants.SESSION_ID).toString())
+            }
+            AppConstants.CREATE_CALL -> {
+                initiatCall()
+                incoming_call_view!!.visibility = View.GONE
+            }
         }
-
-
-    }
-
-    private fun initiatCall() {
-        val receiverID: String = intent.extras!!.get(AppConstants.UID).toString()
-        val callType: String = CometChatConstants.CALL_TYPE_VIDEO
-        val receiverType: String = if (IS_GROUP) {
-            CometChatConstants.RECEIVER_TYPE_GROUP
-        } else {
-            CometChatConstants.RECEIVER_TYPE_USER
-        }
-        val call = Call(receiverID, receiverType, callType)
-
-        CometChat.initiateCall(call, object : CometChat.CallbackListener<Call>() {
-            override fun onSuccess(p0: Call?) {
-                Log.d("INITIATE_CALL", "Call initiated successfully: " + p0?.toString())
-                videoCall(p0!!.sessionId)
-                session_id = p0.sessionId
-                VideoAutoEndCall()
-            }
-
-            override fun onError(p0: CometChatException?) {
-                Log.d("INITIATE_CALL", "Call initialization failed with exception: " + p0?.message)
-            }
-        })
-    }
-
-    private fun VideoAutoEndCall() {
-        Handler().postDelayed({
-            if (IS_AUTO_END) {
-                endCallManually(session_id)
-            }
-        }, 15000)
+        videocallActivity = this
     }
 
 
     private fun videoCall(session_id: String) {
+
         var left = false
         val callSettings: CallSettings = CallSettingsBuilder(this@VIdeoCallActivity, rlVideoCall)
             .setSessionId(session_id)
@@ -150,31 +177,104 @@ class VIdeoCallActivity : AppCompatActivity() {
         })
     }
 
-    override fun onResume() {
-        super.onResume()
-      //  setIncommingCallListener()
+    private fun initiatCall() {
+        val receiverID: String = intent.extras!!.get(AppConstants.UID).toString()
+        val callType: String = CometChatConstants.CALL_TYPE_VIDEO
+        val receiverType: String = if (IS_GROUP) {
+            CometChatConstants.RECEIVER_TYPE_GROUP
+        } else {
+            CometChatConstants.RECEIVER_TYPE_USER
+        }
+        val call = Call(receiverID, receiverType, callType)
+
+        CometChat.initiateCall(call, object : CometChat.CallbackListener<Call>() {
+            override fun onSuccess(p0: Call?) {
+                Log.d("INITIATE_CALL", "Call initiated successfully: " + p0?.toString())
+//                videoCall(p0!!.sessionId)
+                session_id = p0!!.sessionId
+                reject_session_id = p0!!.sessionId
+                VideoAutoEndCall(p0!!.sessionId)
+            }
+
+            override fun onError(p0: CometChatException?) {
+                Log.d("INITIATE_CALL", "Call initialization failed with exception: " + p0?.message)
+            }
+        })
     }
 
-    private fun setIncommingCallListener() {
-        CometChat.addCallListener(resources.getString(R.string.app_name),
-            object : CometChat.CallListener() {
-                override fun onOutgoingCallAccepted(p0: Call?) {
-                    Log.d("RECIEVE_CALL_I", "Outgoing call accepted: " + p0?.toString())
-                }
 
-                override fun onIncomingCallReceived(p0: Call?) {
-                    Log.d("RECIEVE_CALL_I", "Incoming call: " + p0?.toString())
-//                    setCallDialog(p0!!.sessionId, (p0.callInitiator as User).name)
-                }
+    private fun VideoAutoEndCall(sessionId: String) {
+        Handler().postDelayed({
+            if (CometChat.getActiveCall() == null && !isCall_rejected) {
+                rejectCall(sessionId, CometChatConstants.CALL_STATUS_CANCELLED)
+            }
 
-                override fun onIncomingCallCancelled(p0: Call?) {
-                    Log.d("RECIEVE_CALL_I", "Incoming call cancelled: " + p0?.toString())
-                }
+        }, 30000)
+    }
 
-                override fun onOutgoingCallRejected(p0: Call?) {
-                    Log.d("RECIEVE_CALL_I", "Outgoing call rejected: " + p0?.toString())
-                }
+    fun ImageView.LoadImg(url: String) {
+        Glide.with(this.context)
+            .load(url)
+            .placeholder(R.drawable.ic_img_placeholder)
+            .into(this)
 
-            })
+    }
+
+    companion object {
+        var videocallActivity: VIdeoCallActivity? = null
+        var mainView: RelativeLayout? = null
+    }
+
+    private fun acceptCall(sessionId: String) {
+        CometChat.acceptCall(sessionId, object : CometChat.CallbackListener<Call>() {
+            override fun onSuccess(p0: Call?) {
+                Log.d("ACCEPT_CALL", "Call accepted successfully: " + p0?.toString())
+
+                rlVideoCall!!.visibility = View.VISIBLE
+                outgoing_call_view!!.visibility = View.GONE
+                incoming_call_view!!.visibility = View.GONE
+                videoCall(p0!!.sessionId)
+            }
+
+            override fun onError(p0: CometChatException?) {
+                Log.d("ACCEPT_CALL", "Call acceptance failed with exception: " + p0?.message)
+            }
+
+        })
+    }
+
+    private fun rejectCall(sessionId: String, status: String) {
+        CometChat.rejectCall(sessionId, status, object : CometChat.CallbackListener<Call>() {
+            override fun onSuccess(p0: Call?) {
+                Log.d("REJECT_CALL", "Call rejected successfully with status: " + p0?.callStatus)
+                finish()
+            }
+
+            override fun onError(p0: CometChatException?) {
+                Log.d("REJECT_CALL", "Call rejection failed with exception: " + p0?.message)
+            }
+        })
+
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.decline_incoming -> {
+                rejectCall(
+                    intent.extras?.get(AppConstants.SESSION_ID).toString(),
+                    CometChatConstants.CALL_STATUS_REJECTED
+                )
+            }
+            R.id.accept_incoming -> {
+                acceptCall(intent.extras?.get(AppConstants.SESSION_ID).toString())
+            }
+            R.id.call_hang_btn -> {
+                isCall_rejected = true
+                rejectCall(
+                    reject_session_id,
+                    CometChatConstants.CALL_STATUS_CANCELLED
+                )
+            }
+        }
     }
 }

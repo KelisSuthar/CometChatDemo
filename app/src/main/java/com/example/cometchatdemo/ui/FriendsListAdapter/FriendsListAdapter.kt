@@ -59,9 +59,9 @@ class FriendsListAdapterr(val context: Context, var array: ArrayList<Conversatio
                 totalMessage.visibility = View.VISIBLE
             }
             totalMessage.text = data.unreadMessageCount.toString()
-            val date = Date(data.updatedAt)
+
             val format = SimpleDateFormat("HH:mm a")
-            tvTimeStamp.text = format.format(date)
+            tvTimeStamp.text = format.format(data.updatedAt)
             if (user.status == "online") {
                 imgStatus.setImageResource(R.drawable.ic_online)
             } else {
