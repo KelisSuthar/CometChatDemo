@@ -1,14 +1,12 @@
 package com.example.cometchatdemo.ui
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.RecyclerView
@@ -63,11 +61,33 @@ class FriendsListActivity : AppCompatActivity() {
                     getAllFriendsList(CometChatConstants.CONVERSATION_TYPE_GROUP)
                 }
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
+        addGroup!!.setImageResource(R.drawable.ic_menu)
         addGroup!!.setOnClickListener {
-            dialogCreateGroup()
+
+            val popupMenu = PopupMenu(this@FriendsListActivity, addGroup)
+            popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu);
+
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.createGroup -> {
+                        dialogCreateGroup()
+                    }
+                    R.id.joinGroup -> {
+                        startActivity(
+                            Intent(
+                                this@FriendsListActivity,
+                                AllGroupListActivity::class.java
+                            )
+                        )
+                    }
+                }
+                true
+            }
+            popupMenu.show()
         }
     }
 
@@ -270,9 +290,6 @@ class FriendsListActivity : AppCompatActivity() {
                     if (it.lastMessage != null) {
                         Log.d("USER_LIST_STATUS", (it.lastMessage.rawMessage).toString())
                     }
-
-
-
                     if (conversationType == CometChatConstants.CONVERSATION_TYPE_USER) {
 
                         friends_array.add(it)

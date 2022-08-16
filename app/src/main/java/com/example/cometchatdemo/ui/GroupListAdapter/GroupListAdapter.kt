@@ -56,7 +56,7 @@ class GroupListAdapter(val context: Context, var array: ArrayList<Conversation>)
                 } else if (data.lastMessage.rawMessage.get("type") == "video") {
 
                     txt_user_message.text = "Members: " + group.membersCount + "\nVideo"
-                } else {
+                } else if(data.lastMessage.rawMessage.get("type") == "text") {
                     val parent: JSONObject = (data.lastMessage.rawMessage.get("data") as JSONObject)
                     val entities: JSONObject =
                         (parent.get("entities") as JSONObject).get("sender") as JSONObject
