@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.cometchat.pro.core.CometChat
 import com.cometchat.pro.core.CometChat.CallbackListener
@@ -77,7 +78,7 @@ class AllGroupsAdapter(val context: Context, var array: ArrayList<Group>) :
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
         builder.setTitle("Alert Dialog!!")
 
-        builder.setMessage("Do you want to close this application ?")
+        builder.setMessage("Do you want to join this group ?")
             .setCancelable(true)
             .setPositiveButton("Yes") { dialog, id ->
                 dialog.cancel()
@@ -96,8 +97,7 @@ class AllGroupsAdapter(val context: Context, var array: ArrayList<Group>) :
     }
 
     private fun joinGroup(guid: String, groupType: String) {
-
-        CometChat.joinGroup(guid, groupType, "password", object : CallbackListener<Group>() {
+        CometChat.joinGroup(guid, groupType, "", object : CallbackListener<Group>() {
             override fun onSuccess(joinedGroup: Group) {
                 Log.d("JOIN_GROUP", joinedGroup.toString())
                 context.startActivity(
@@ -110,6 +110,7 @@ class AllGroupsAdapter(val context: Context, var array: ArrayList<Group>) :
 
             override fun onError(e: CometChatException) {
                 Log.d("JOIN_GROUP", "Group joining failed with exception: " + e.message)
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
             }
         })
 

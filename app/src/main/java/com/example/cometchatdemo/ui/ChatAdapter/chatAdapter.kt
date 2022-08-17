@@ -65,12 +65,13 @@ class chatAdapter(var array: ArrayList<ChatMessages>, var b: Boolean) :
             txtSendMsg.text = data.msg
             txtRecieveMsg.text = data.msg
 
-            val format = SimpleDateFormat("HH:mm a")
+
+            val format = SimpleDateFormat("hh:mm a")
             if (b) {
                 txtRecieveMsgName.text =
-                    data.sender_name + "\n" + format.format(data.message_time!!.toLong())
+                    data.sender_name + "\n" + format.format((data.message_time!! + "000").toLong())
                 txtSendMsgName.text =
-                    data.sender_name + "\n" + format.format(data.message_time!!.toLong())
+                    data.sender_name + "\n" + format.format((data.message_time!! + "000").toLong())
             } else {
                 txtRecieveMsgName.text = format.format(data.message_time!!.toLong())
                 txtSendMsgName.text = format.format(data.message_time.toLong())
@@ -102,12 +103,12 @@ class chatAdapter(var array: ArrayList<ChatMessages>, var b: Boolean) :
         fun bind(data: ChatMessages, position: Int) {
             imgLeft.LoadImg(data.url.toString())
             imgRight.LoadImg(data.url.toString())
-            val format = SimpleDateFormat("HH:mm a")
+            val format = SimpleDateFormat("hh:mm a")
             if (b) {
                 txtRecieveMsgName.text =
-                    data.sender_name + "\n" + format.format(data.message_time!!.toLong())
+                    data.sender_name + "\n" + format.format((data.message_time!! + "000").toLong())
                 txtSendMsgName.text =
-                    data.sender_name + "\n" + format.format(data.message_time.toLong())
+                    data.sender_name + "\n" + format.format((data.message_time!! + "000").toLong())
             } else {
                 txtRecieveMsgName.text = format.format(data.message_time!!.toLong())
                 txtSendMsgName.text = format.format(data.message_time.toLong())

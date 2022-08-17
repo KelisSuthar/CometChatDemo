@@ -142,6 +142,7 @@ class FriendsListActivity : AppCompatActivity() {
                 createGroup(
                     group_name.text?.trim().toString(),
                     group_desc.text?.trim().toString(),
+                    group_pwd.text?.trim().toString(),
                     grouptype_spinner.selectedItemPosition
                 )
                 dialog.dismiss()
@@ -181,7 +182,7 @@ class FriendsListActivity : AppCompatActivity() {
 
     }
 
-    private fun createGroup(name: String, group_desc: String, pos: Int) {
+    private fun createGroup(name: String, group_desc: String, pass: String, pos: Int) {
         val GUID = System.currentTimeMillis()
         var groupType: String = CometChatConstants.GROUP_TYPE_PUBLIC
         when (pos) {
@@ -195,14 +196,18 @@ class FriendsListActivity : AppCompatActivity() {
                 groupType = CometChatConstants.GROUP_TYPE_PASSWORD
             }
         }
-
-
-        val group = Group(GUID.toString(), name, groupType, "")
+        val group = Group(
+            GUID.toString(),
+            name,
+            groupType,
+            pass,
+            "https://data-us.cometchat.io/assets/images/avatars/ironman.png",
+            group_desc
+        )
 
         CometChat.createGroup(group, object : CallbackListener<Group>() {
             override fun onSuccess(group: Group) {
                 Log.d("CREATE_GROUP", "Group created successfully: $group")
-                tabGroups!!.isSelected = true
 
             }
 

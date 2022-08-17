@@ -50,6 +50,7 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
     var adapter: chatAdapter? = null
     var recyclerView: RecyclerView? = null
     var editText: TextInputEditText? = null
+    var messagesRequest: MessagesRequest? = null
     private val mMessages: ArrayList<ChatMessages> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,11 +93,22 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
         adapter = chatAdapter(mMessages, false)
         recyclerView!!.adapter = adapter
 
+        messagesRequest = MessagesRequest.MessagesRequestBuilder()
+            .setLimit(10)
+//            .setUID(AppConstants.REC_UID)
+            .setUID(intent.extras!!.get(AppConstants.UID).toString())
+            .build()
+
         callHistory()
+
+
+
+
 
         btn!!.setOnClickListener(this)
         file_attech!!.setOnClickListener(this)
         imgVideoCall!!.setOnClickListener(this)
+        img_profile!!.setOnClickListener(this)
 
 
     }
@@ -104,6 +116,9 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when (v?.id) {
+            R.id.img_profile -> {
+                callHistory()
+            }
             R.id.send -> {
                 image!!.visibility = View.GONE
                 editText!!.visibility = View.VISIBLE
@@ -374,66 +389,75 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun callHistory() {
-        val messagesRequest: MessagesRequest? = MessagesRequest.MessagesRequestBuilder()
-            .setLimit(100)
-//            .setUID(AppConstants.REC_UID)
-            .setUID(intent.extras!!.get(AppConstants.UID).toString())
-            .build()
+
         messagesRequest?.fetchPrevious(object : CometChat.CallbackListener<List<BaseMessage>>() {
             override fun onSuccess(p0: List<BaseMessage>?) {
-                if (!p0.isNullOrEmpty()) {
-                    p0.forEach { Log.d("HISTORY", it.toString()) }
-                    for (baseMessage in p0) {
+                p0!!.forEach { Log.d("HISTORY", it.category.toString()) }
+//                p0!!.forEach { Log.d("DETAILED_HISTORY", it.toString()) }
 
-                        if (baseMessage is TextMessage) {
-//                            Log.d("HISTORY", "TextMessage: ${baseMessage.text}")
-                            mMessages.add(
-                                ChatMessages(
-                                    baseMessage.text,
-                                    "",
-                                    baseMessage.sender.uid,
-                                    "",
-                                    false,
-                                    baseMessage.sentAt.toString()
-                                )
-                            )
-                        } else if (baseMessage is MediaMessage) {
-//                            Log.d("HISTORY", "MediaMessage: ${baseMessage.attachment.fileUrl}")
-                            mMessages.add(
-                                ChatMessages(
-                                    "",
-                                    baseMessage.attachment.fileUrl,
-                                    baseMessage.sender.uid,
-                                    "",
-                                    true,
-                                    baseMessage.sentAt.toString()
-                                )
-                            )
-                        }else if(baseMessage is Call){
-                        }else if(baseMessage is Action)
-                        {
-
-                        }
-                        CometChat.markAsRead(
-                            baseMessage.id,
-                            baseMessage.sender.uid,
-                            CometChatConstants.RECEIVER_TYPE_USER,
-                            baseMessage.sender.uid
-                        )
-                        adapter?.notifyDataSetChanged()
-                        recyclerView?.scrollToPosition(adapter!!.itemCount - 1)
-
-
-                    }
-                }
 
             }
 
             override fun onError(p0: CometChatException?) {
-                Log.d("HISTORY", "Message fetching failed with exception: " + p0?.message)
 
             }
+
         })
+//        messagesRequest?.fetchPrevious(object : CometChat.CallbackListener<List<BaseMessage>>() {
+//            override fun onSuccess(p0: List<BaseMessage>?) {
+//                if (!p0.isNullOrEmpty()) {
+//                    p0.forEach { Log.d("HISTORY", it.toString()) }
+//                    for (baseMessage in p0) {
+//
+//                        if (baseMessage is TextMessage) {
+////                            Log.d("HISTORY", "TextMessage: ${baseMessage.text}")
+//                            mMessages.add(
+//                                ChatMessages(
+//                                    baseMessage.text,
+//                                    "",
+//                                    baseMessage.sender.uid,
+//                                    "",
+//                                    false,
+//                                    baseMessage.sentAt.toString()
+//                                )
+//                            )
+//                        } else if (baseMessage is MediaMessage) {
+////                            Log.d("HISTORY", "MediaMessage: ${baseMessage.attachment.fileUrl}")
+//                            mMessages.add(
+//                                ChatMessages(
+//                                    "",
+//                                    baseMessage.attachment.fileUrl,
+//                                    baseMessage.sender.uid,
+//                                    "",
+//                                    true,
+//                                    baseMessage.sentAt.toString()
+//                                )
+//                            )
+//                        }else if(baseMessage is Call){
+//                        }else if(baseMessage is Action)
+//                        {
+//
+//                        }
+//                        CometChat.markAsRead(
+//                            baseMessage.id,
+//                            baseMessage.sender.uid,
+//                            CometChatConstants.RECEIVER_TYPE_USER,
+//                            baseMessage.sender.uid
+//                        )
+//                        adapter?.notifyDataSetChanged()
+//                        recyclerView?.scrollToPosition(adapter!!.itemCount - 1)
+//
+//
+//                    }
+//                }
+//
+//            }
+//
+//            override fun onError(p0: CometChatException?) {
+//                Log.d("HISTORY", "Message fetching failed with exception: " + p0?.message)
+//
+//            }
+//        })
     }
 
     private fun sendNormalMessage() {
@@ -451,7 +475,16 @@ class MessageListActivity : AppCompatActivity(), View.OnClickListener {
             override fun onSuccess(p0: TextMessage?) {
                 Log.d("SEND_NORMAL_MESSAGE", "Message sent successfully: " + p0?.toString())
 
-                mMessages.add(ChatMessages(p0?.text, "", p0?.sender?.uid, "", false, p0?.sentAt.toString()))
+                mMessages.add(
+                    ChatMessages(
+                        p0?.text,
+                        "",
+                        p0?.sender?.uid,
+                        "",
+                        false,
+                        p0?.sentAt.toString()
+                    )
+                )
                 editText!!.setText("")
                 adapter!!.notifyDataSetChanged()
                 recyclerView!!.scrollToPosition(recyclerView!!.adapter!!.itemCount - 1)

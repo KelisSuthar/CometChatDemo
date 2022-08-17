@@ -6,5 +6,5 @@ data class ChatMessages(
     val sender: String? = "",
     val sender_name: String? = "",
     val is_image: Boolean? = false,
-    val message_time: String? = "",
+    val message_time: String? = "0",
 )

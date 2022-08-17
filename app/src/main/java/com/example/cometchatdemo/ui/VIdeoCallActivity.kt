@@ -98,7 +98,6 @@ class VIdeoCallActivity : AppCompatActivity(), View.OnClickListener {
         videocallActivity = this
     }
 
-
     private fun videoCall(session_id: String) {
 
         var left = false

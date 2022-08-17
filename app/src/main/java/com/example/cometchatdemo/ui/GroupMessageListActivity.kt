@@ -55,6 +55,8 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
     var recyclerView: RecyclerView? = null
     var editText: TextInputEditText? = null
     var group_info: Group? = null
+    var isAdmin = false
+    var owner = ""
     private val mMessages: ArrayList<ChatMessages> = ArrayList()
     private val members_list: ArrayList<GroupMember> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -183,18 +185,18 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
                 setMediaDialog()
             }
             R.id.imgVideoCall -> {
-                 startActivity (
-                        Intent(
-                            this@GroupMessageListActivity,
-                            VIdeoCallActivity::class.java
-                        ).putExtra(AppConstants.CALL_TYPE, AppConstants.CREATE_CALL).putExtra(
-                            AppConstants.UID,
-                            intent.extras!!.get(AppConstants.UID).toString()
-                        ).putExtra(
-                            AppConstants.IS_GROUP,
-                            true
-                        )
-                        )
+                startActivity(
+                    Intent(
+                        this@GroupMessageListActivity,
+                        VIdeoCallActivity::class.java
+                    ).putExtra(AppConstants.CALL_TYPE, AppConstants.CREATE_CALL).putExtra(
+                        AppConstants.UID,
+                        intent.extras!!.get(AppConstants.UID).toString()
+                    ).putExtra(
+                        AppConstants.IS_GROUP,
+                        true
+                    )
+                )
                 finish()
             }
             R.id.imgGroupInfo -> {
@@ -218,7 +220,34 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
         val txt_user_name = dialog.findViewById<TextView>(R.id.txt_user_name)
         val txtDesc = dialog.findViewById<TextView>(R.id.txtDesc)
         val rvGroupMembers = dialog.findViewById<RecyclerView>(R.id.rvGroupMembers)
-        val aadpter = GroupInfoAdapter(members_list)
+        val txtDeleteGroup = dialog.findViewById<TextView>(R.id.txtDeleteGroup)
+        val txtRemoveGroup = dialog.findViewById<TextView>(R.id.txtRemoveGroup)
+        val ivAddParticipant = dialog.findViewById<ImageView>(R.id.ivAddParticipant)
+        if (owner == AppConstants.MY_UID || isAdmin) {
+            txtDeleteGroup.visibility = View.VISIBLE
+            ivAddParticipant.visibility = View.VISIBLE
+        }
+
+        val aadpter =
+            GroupInfoAdapter(
+                this,
+                isAdmin,
+                owner,
+                members_list,
+                object : GroupInfoAdapter.ItemClick {
+                    override fun onRemoveClick(data: GroupMember) {
+                        removeBanMember(data, true)
+                    }
+
+                    override fun onBanClick(data: GroupMember) {
+                        removeBanMember(data, false)
+                    }
+
+                    override fun onScopChange(data: GroupMember, new_scop: String) {
+                        chnageScope(data, new_scop)
+                    }
+
+                })
         rvGroupMembers.adapter = aadpter
         txtDesc.text = group_info!!.description
         txt_user_name.text = group_info!!.name
@@ -226,8 +255,113 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
             .load(group_info!!.icon)
             .placeholder(R.drawable.ic_img_placeholder)
             .into(img_profile)
+        txtRemoveGroup.setOnClickListener {
+            dialog.dismiss()
+            if(owner==AppConstants.MY_UID)
+            {
+                Toast.makeText(this, "Please Transfer thw ownership to other member", Toast.LENGTH_SHORT).show()
+            }else{
+                removeFromGroup(intent.extras!!.getString(AppConstants.UID).toString())
+            }
 
+        }
+        ivAddParticipant.setOnClickListener {
+            dialog.dismiss()
+        }
+        txtDeleteGroup.setOnClickListener {
+            dialog.dismiss()
+            deleteGroup()
+        }
         dialog.show()
+    }
+
+    private fun chnageScope(data: GroupMember, newScop: String) {
+
+
+        CometChat.updateGroupMemberScope(
+            data.uid,
+            intent.extras!!.get(AppConstants.UID).toString(),
+            newScop,
+            object : CometChat.CallbackListener<String>() {
+                override fun onSuccess(p0: String?) {
+                    Log.d("CHANGE_SCOPE", "User scope updated successfully")
+                }
+
+                override fun onError(p0: CometChatException?) {
+                    Log.d("CHANGE_SCOPE", "User scope update failed with exception: " + p0?.message)
+                }
+            })
+    }
+
+    private fun deleteGroup() {
+        CometChat.deleteGroup(intent.extras!!.get(AppConstants.UID).toString(),
+            object : CometChat.CallbackListener<String>() {
+                override fun onSuccess(p0: String?) {
+                    Log.d("DELETE_GROUP", "Groups deleted successfully \n$p0")
+                    onBackPressed()
+                }
+
+                override fun onError(p0: CometChatException?) {
+                    Log.d("DELETE_GROUP", "Group delete failed with exception: " + p0?.message)
+                }
+            })
+    }
+
+    private fun removeBanMember(data: GroupMember, b: Boolean) {
+        if (b) {
+//Remove Member
+            CometChat.kickGroupMember(
+                data.uid,
+                intent.extras!!.get(AppConstants.UID).toString(),
+                object : CometChat.CallbackListener<String>() {
+                    override fun onSuccess(p0: String?) {
+                        Log.d("REMOVE_MEMBER", "Group member kicked successfully\n$p0")
+                    }
+
+                    override fun onError(p0: CometChatException?) {
+                        Log.d(
+                            "REMOVE_MEMBER",
+                            "Group member kicking failed with exception: " + p0?.message
+                        )
+                    }
+                })
+        } else {
+            //Ban Member
+
+            CometChat.banGroupMember(
+                data.uid,
+                intent.extras!!.get(AppConstants.UID).toString(),
+                object : CometChat.CallbackListener<String>() {
+                    override fun onSuccess(p0: String?) {
+                        Log.d("BAN_MEMBER", "Group member banned successfully")
+                    }
+
+                    override fun onError(p0: CometChatException?) {
+                        Log.d(
+                            "BAN_MEMBER",
+                            "Group member banning failed with exception: " + p0?.message
+                        )
+                    }
+                })
+        }
+
+    }
+
+
+    private fun removeFromGroup(UID: String) {
+        CometChat.leaveGroup(UID, object : CometChat.CallbackListener<String>() {
+            override fun onSuccess(p0: String?) {
+                Log.d("REMOVE_GROUP", "Group left successfully")
+                onBackPressed()
+
+            }
+
+            override fun onError(p0: CometChatException?) {
+                Log.d("REMOVE_GROUP", "Group leaving failed with exception: " + p0?.message)
+            }
+
+        })
+
     }
 
 
@@ -246,7 +380,16 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
             override fun onSuccess(p0: TextMessage?) {
                 Log.d("SEND_NORMAL_MESSAGE", "Message sent successfully: " + p0?.toString())
 
-                mMessages.add(ChatMessages(p0?.text, "", p0?.sender?.uid, p0!!.sender.name, false,textMessage.sentAt.toString()))
+                mMessages.add(
+                    ChatMessages(
+                        p0?.text,
+                        "",
+                        p0?.sender?.uid,
+                        p0!!.sender.name,
+                        false,
+                        p0.sentAt.toString()
+                    )
+                )
                 editText!!.setText("")
                 adapter!!.notifyDataSetChanged()
                 recyclerView!!.scrollToPosition(recyclerView!!.adapter!!.itemCount - 1)
@@ -446,6 +589,11 @@ class GroupMessageListActivity : AppCompatActivity(), View.OnClickListener {
                 override fun onSuccess(p0: Group?) {
                     Log.d("GROUP_DETAILS", "Group details fetched successfully: " + p0?.toString())
                     group_info = p0
+                    owner = p0!!.owner
+                    if (p0.scope == "admin") {
+                        isAdmin = true
+                    }
+
 
                     Glide.with(this@GroupMessageListActivity)
                         .load(p0!!.icon)

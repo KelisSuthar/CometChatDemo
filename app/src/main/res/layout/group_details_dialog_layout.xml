@@ -37,22 +37,30 @@
                 android:textColor="@color/black"
                 android:textSize="@dimen/_15sdp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/ivAddParticipant"
                 app:layout_constraintStart_toEndOf="@+id/img_profile"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/full_names" />
+
 
             <TextView
                 android:id="@+id/txtDesc"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/txt_user_name"
                 android:text="@{group.groupType}"
                 android:textSize="@dimen/_10sdp"
-                app:layout_constraintEnd_toEndOf="@+id/txt_user_name"
+                app:layout_constraintEnd_toEndOf="@+id/ivAddParticipant"
                 app:layout_constraintStart_toEndOf="@+id/img_profile"
                 app:layout_constraintTop_toBottomOf="@+id/txt_user_name" />
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivAddParticipant"
+                android:layout_width="@dimen/_40sdp"
+                android:layout_height="@dimen/_40sdp"
+                android:src="@drawable/ic_add"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -61,11 +69,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/_10sdp"
-            android:maxHeight="@dimen/_300sdp"
+            android:maxHeight="@dimen/_250sdp"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cl2"
             tools:listitem="@layout/group_user_row_layout" />
+
+        <TextView
+            android:id="@+id/txtRemoveGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:text="@string/remove_group"
+            android:textColor="@color/red"
+            android:textSize="@dimen/_20sdp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rvGroupMembers" />
+
+        <TextView
+            android:id="@+id/txtDeleteGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:text="@string/delete_group"
+            android:textColor="@color/red"
+            android:textSize="@dimen/_20sdp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rvGroupMembers" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

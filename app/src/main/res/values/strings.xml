@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">CometChatDemo</string>
+    <string name="remove_group"><u>Remove Group</u></string>
+    <string name="delete_group"><u>Delete Group</u></string>
     <array name="groupType">
         <item>Public Group</item>
         <item>Private Group</item>
