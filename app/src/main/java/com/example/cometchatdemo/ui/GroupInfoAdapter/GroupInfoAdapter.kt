@@ -78,7 +78,7 @@ class GroupInfoAdapter(
             itemView.setOnLongClickListener {
                 if (data.uid != AppConstants.MY_UID) {
                     if (isAdmin) {
-                        setDialog(context, data)
+                        setDialog(context, data,position)
                     }
 
                 }
@@ -88,14 +88,14 @@ class GroupInfoAdapter(
             itemView.setOnClickListener {
                 if (data.uid != AppConstants.MY_UID) {
                     if (isAdmin) {
-                        showMenu(context, data, itemView)
+                        showMenu(context, data, itemView,position)
                     }
                 }
             }
         }
     }
 
-    private fun setDialog(context: Context, data: GroupMember) {
+    private fun setDialog(context: Context, data: GroupMember, position: Int) {
         val dialog = Dialog(
             context,
             com.google.android.material.R.style.Base_Theme_AppCompat_Light_Dialog_Alert
@@ -128,13 +128,16 @@ class GroupInfoAdapter(
                 dialog.dismiss()
                 when (radioGroup.checkedRadioButtonId) {
                     R.id.rbAdmin -> {
-                        listener.onScopChange(data, CometChatConstants.SCOPE_ADMIN)
+                        listener.onScopChange(data, CometChatConstants.SCOPE_ADMIN,position)
+                    }
+                    R.id.rbOwner -> {
+                        listener.onChnageOwnership(data)
                     }
                     R.id.rbModerator -> {
-                        listener.onScopChange(data, CometChatConstants.SCOPE_MODERATOR)
+                        listener.onScopChange(data, CometChatConstants.SCOPE_MODERATOR,position)
                     }
                     R.id.rbParticipant -> {
-                        listener.onScopChange(data, CometChatConstants.SCOPE_PARTICIPANT)
+                        listener.onScopChange(data, CometChatConstants.SCOPE_PARTICIPANT,position)
                     }
                 }
             }
@@ -145,7 +148,7 @@ class GroupInfoAdapter(
     }
 
 
-    private fun showMenu(context: Context, data: GroupMember, itemView: View) {
+    private fun showMenu(context: Context, data: GroupMember, itemView: View, position: Int) {
         val popupMenu = PopupMenu(context, itemView)
 
         popupMenu.menuInflater.inflate(
@@ -155,10 +158,10 @@ class GroupInfoAdapter(
         popupMenu.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.removeMember -> {
-                    listener.onRemoveClick(data)
+                    listener.onRemoveClick(data, position)
                 }
                 R.id.banMember -> {
-                    listener.onBanClick(data)
+                    listener.onBanClick(data,position)
                 }
             }
 
@@ -169,9 +172,10 @@ class GroupInfoAdapter(
     }
 
     interface ItemClick {
-        fun onRemoveClick(data: GroupMember)
-        fun onBanClick(data: GroupMember)
-        fun onScopChange(data: GroupMember, new_scop: String)
+        fun onRemoveClick(data: GroupMember,position: Int)
+        fun onBanClick(data: GroupMember,position: Int)
+        fun onScopChange(data: GroupMember, new_scop: String, position: Int)
+        fun onChnageOwnership(data: GroupMember)
     }
 
     fun ImageView.LoadImg(url: String) {

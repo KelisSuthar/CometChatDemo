@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.cometchat.pro.models.Conversation
 import com.cometchat.pro.models.Group
+import com.cometchat.pro.models.User
 import com.example.cometchatdemo.R
 import com.example.cometchatdemo.constants.AppConstants
 import com.example.cometchatdemo.ui.ChatAdapter.LoadImg

@@ -25,9 +25,13 @@
         android:theme="@style/Theme.CometChatDemo"
         tools:targetApi="31">
         <activity
+            android:name=".ui.AllUsersList"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".ui.AllGroupListActivity"
-            android:exported="false" />
-
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.GroupMessageListActivity"
             android:exported="false"
